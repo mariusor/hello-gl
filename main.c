@@ -2,37 +2,55 @@
 
 #include <GL/glew.h>
 #include <GL/glut.h>
-#include <GL/gl.h>
 
+#define array_length(a) (sizeof(a) / sizeof(a[0]))
 #include "math_3d.h"
 
-void RenderSceneCB()
+GLuint VBO;
+
+static void RenderSceneCB()
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+#if 1
+    float Vertices[3][3] = {
+        {-1.0f, -1.0f, 0.0f},
+        { 1.0f, -1.0f, 0.0f},
+        { 0.0f,  1.0f, 0.0f},
+    };
+#else
+    Vector3f Vertices[3];
+    Vertices[0] = Vector3fNew (-1.0f, -1.0f, 0.0f);
+    Vertices[1] = Vector3fNew (1.0f, -1.0f, 0.0f);
+    Vertices[2] = Vector3fNew (0.0f, 1.0f, 0.0f);
+#endif
 
-    Vector3f Vertices[1];
-    Vertices[0] = Vector3fNew(0.0f, 0.0f, 0.0f);
+#if 0
+    fprintf(stdout, "sizeof vertices %lu\n", sizeof(Vertices));
+    for (size_t i = 0; i < array_length(Vertices); i++) {
+        fprintf(stdout, "v3(%+.2g %+.2g %+.2g)\n", Vertices[i][0], Vertices[i][1], Vertices[i][2]);
+    }
+#endif
 
-    GLuint VBO;
+
     glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glDrawArrays(GL_POINTS, 0, 1);
-    glDisableVertexAttribArray(0);
 
-    glutSwapBuffers();
+    glBindBuffer (GL_ARRAY_BUFFER, VBO);
+    glBufferData (GL_ARRAY_BUFFER, sizeof(Vertices), Vertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray (0);
+
+    glBindBuffer (GL_ARRAY_BUFFER, VBO);
+    glVertexAttribPointer (0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // draw the elements
+    glDrawArrays (GL_POINTS, 0, 3);
+
+    glDisableVertexAttribArray (0);
+
+    glutSwapBuffers ();
 }
 
 int main (int argc, char* argv[])
 {
-    if (argc > 0) {
-        char* name = &(argv[0][2]);
-        fprintf(stderr, "%s", name);
-    }
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
@@ -40,7 +58,7 @@ int main (int argc, char* argv[])
     int height = 512;
 
     glutInitWindowSize(width, height);
-    glutInitWindowPosition(0,0);
+    glutInitWindowPosition(100,100);
     glutCreateWindow("Hello Open GL: 01");
 
     GLenum res = glewInit();
@@ -48,7 +66,8 @@ int main (int argc, char* argv[])
         fprintf(stderr, "Error: %s\n", glewGetErrorString(res));
         return EXIT_FAILURE;
     }
-
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glutDisplayFunc(RenderSceneCB);
 
