@@ -1,6 +1,6 @@
 BIN_NAME = hello-gl
 CC ?= cc
-LIBS = freeglut glew gl
+LIBS = freeglut glew #gl
 COMPILE_FLAGS = -Wpedantic -Wall -Wextra
 LINK_FLAGS =
 RCOMPILE_FLAGS =
@@ -21,7 +21,7 @@ debug: export CFLAGS := $(CFLAGS) $(COMPILE_FLAGS) $(DCOMPILE_FLAGS)
 debug: export LDFLAGS := $(LDFLAGS) $(LINK_FLAGS) $(DLINK_FLAGS)
 
 .PHONY: all
-all: clean debug
+all: clean debug run
 
 .PHONY: debug
 debug: executable
@@ -35,6 +35,10 @@ executable: $(BIN_NAME)
 .PHONY: clean
 clean:
 	$(RM) $(BIN_NAME)
+
+.PHONY: run
+run:
+	./$(BIN_NAME)
 
 $(BIN_NAME):
 	$(CC) $(CFLAGS) $(INCLUDES) $(SOURCES) $(LDFLAGS) -o$(BIN_NAME)
